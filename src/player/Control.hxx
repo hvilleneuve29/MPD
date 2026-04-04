@@ -213,6 +213,7 @@ class PlayerControl final : public AudioOutputClient {
 
 public:
 	bool user_requested_stop = true;
+	bool is_stream = false;
 
 	PlayerControl(PlayerListener &_listener,
 		      PlayerOutputs &_outputs,

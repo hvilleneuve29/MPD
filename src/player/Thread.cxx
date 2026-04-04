@@ -1226,23 +1226,33 @@ Player::Run() noexcept
 	cross_fade_tag.reset();
 
 	if (song != nullptr) {
-		if (!pc.user_requested_stop) {
+		if (pc.is_stream && !pc.user_requested_stop) {
 			FmtNotice(player_domain, "stream: abnormal stop detected");
-			//LogDebug(player_domain, "stream: abnormal stop detected");
+		} else {
+			FmtNotice(player_domain, "played {:?}", song->GetURI());
+			song.reset();
+		}
+	}
+
+	if (pc.is_stream && !pc.user_requested_stop) {
+		// Trigger a restart
+		// Set the command directly on the PlayerControl object
+		//pc.Play(song);
+		pc.command = PlayerCommand::QUEUE;
+
+		// Optional: Add a small sleep to prevent rapid-fire loops
+		// if the network is completely down.
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	} else {
+		pc.ClearTaggedSong();
+
+		if (queued) {
+			assert(pc.next_song != nullptr);
+			pc.next_song.reset();
 		}
 
-		FmtNotice(player_domain, "played {:?}", song->GetURI());
-		song.reset();
+		pc.state = PlayerState::STOP;
 	}
-
-	pc.ClearTaggedSong();
-
-	if (queued) {
-		assert(pc.next_song != nullptr);
-		pc.next_song.reset();
-	}
-
-	pc.state = PlayerState::STOP;
 }
 
 static void
