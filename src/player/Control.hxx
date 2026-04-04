@@ -212,6 +212,8 @@ class PlayerControl final : public AudioOutputClient {
 	FloatDuration total_play_time = FloatDuration::zero();
 
 public:
+	bool user_requested_stop = true;
+
 	PlayerControl(PlayerListener &_listener,
 		      PlayerOutputs &_outputs,
 		      InputCacheManager *_input_cache,

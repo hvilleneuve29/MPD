@@ -1226,6 +1226,11 @@ Player::Run() noexcept
 	cross_fade_tag.reset();
 
 	if (song != nullptr) {
+		if (!pc.user_requested_stop) {
+			FmtNotice(player_domain, "stream: abnormal stop detected");
+			//LogDebug(player_domain, "stream: abnormal stop detected");
+		}
+
 		FmtNotice(player_domain, "played {:?}", song->GetURI());
 		song.reset();
 	}

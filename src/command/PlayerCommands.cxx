@@ -18,6 +18,8 @@
 #include "util/ScopeExit.hxx"
 #include "util/Exception.hxx"
 #include "util/Math.hxx"
+#include "util/Domain.hxx"
+#include "Log.hxx"
 
 #ifdef ENABLE_DATABASE
 #include "db/update/Service.hxx"
@@ -46,12 +48,18 @@
 #define COMMAND_STATUS_UPDATING_DB	"updating_db"
 #define COMMAND_STATUS_LOADED_PLAYLIST  "lastloadedplaylist"
 
+static constexpr Domain hugo_domain("hugo");
+
 CommandResult
 handle_play(Client &client, Request args, [[maybe_unused]] Response &r)
 {
 	int song = args.ParseOptional(0, -1);
 
+	FmtNotice(hugo_domain, "handle_play() entry");
+
+	client.GetPartition().pc.user_requested_stop = false;
 	client.GetPartition().PlayPosition(song);
+
 	return CommandResult::OK;
 }
 
@@ -60,6 +68,9 @@ handle_playid(Client &client, Request args, [[maybe_unused]] Response &r)
 {
 	int id = args.ParseOptional(0, -1);
 
+	FmtNotice(hugo_domain, "handle_playid() entry");
+
+	client.GetPartition().pc.user_requested_stop = false;
 	client.GetPartition().PlayId(id);
 	return CommandResult::OK;
 }
@@ -67,7 +78,11 @@ handle_playid(Client &client, Request args, [[maybe_unused]] Response &r)
 CommandResult
 handle_stop(Client &client, [[maybe_unused]] Request args, [[maybe_unused]] Response &r)
 {
+	FmtNotice(hugo_domain, "handle_stop() entry");
+
+	client.GetPartition().pc.user_requested_stop = true;
 	client.GetPartition().Stop();
+
 	return CommandResult::OK;
 }
 
@@ -82,6 +97,8 @@ CommandResult
 handle_pause(Client &client, Request args, [[maybe_unused]] Response &r)
 {
 	auto &pc = client.GetPlayerControl();
+
+	FmtNotice(hugo_domain, "handle_pause() entry");
 
 	if (!args.empty()) {
 		bool pause_flag = args.ParseBool(0);
@@ -209,6 +226,8 @@ handle_next(Client &client, [[maybe_unused]] Request args, [[maybe_unused]] Resp
 {
 	playlist &playlist = client.GetPlaylist();
 
+	FmtNotice(hugo_domain, "handle_next() entry");
+
 	/* single mode is not considered when this is user who
 	 * wants to change song. */
 	const SingleMode single = playlist.queue.single;
@@ -234,6 +253,9 @@ CommandResult
 handle_repeat(Client &client, Request args, [[maybe_unused]] Response &r)
 {
 	bool status = args.ParseBool(0);
+
+	FmtNotice(hugo_domain, "handle_repeat() entry");
+
 	client.GetPartition().SetRepeat(status);
 	return CommandResult::OK;
 }
@@ -241,6 +263,8 @@ handle_repeat(Client &client, Request args, [[maybe_unused]] Response &r)
 CommandResult
 handle_single(Client &client, Request args, [[maybe_unused]] Response &r)
 {
+	FmtNotice(hugo_domain, "handle_single() entry");
+
 	auto new_mode = SingleFromString(args.front());
 	client.GetPartition().SetSingle(new_mode);
 	return CommandResult::OK;
