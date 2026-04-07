@@ -5,9 +5,13 @@
 #include "Outputs.hxx"
 #include "Listener.hxx"
 #include "song/DetachedSong.hxx"
+#include "util/Domain.hxx"
+#include "Log.hxx"
 
 #include <algorithm>
 #include <cassert>
+
+static constexpr Domain hugo_domain("hugo");
 
 PlayerControl::PlayerControl(PlayerListener &_listener,
 			     PlayerOutputs &_outputs,
@@ -42,6 +46,8 @@ PlayerControl::WaitOutputConsumed(std::unique_lock<Mutex> &lock,
 void
 PlayerControl::Play(std::unique_ptr<DetachedSong> song)
 {
+	FmtNotice(hugo_domain, "PlayerControl::Play() entry");
+
 	if (!thread.IsDefined())
 		thread.Start();
 
