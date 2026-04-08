@@ -350,6 +350,8 @@ CurlInputStream::OnEnd()
 	const std::scoped_lock protect{mutex};
 	InvokeOnAvailable();
 
+	FmtNotice(curl_domain, "CurlInputStream::OnEnd()");
+
 	AsyncInputStream::SetClosed();
 }
 
@@ -365,6 +367,8 @@ CurlInputStream::OnError(std::exception_ptr e) noexcept
 		SetReady();
 	else
 		InvokeOnAvailable();
+
+	FmtNotice(curl_domain, "CurlInputStream::OnError()");
 
 	AsyncInputStream::SetClosed();
 }
