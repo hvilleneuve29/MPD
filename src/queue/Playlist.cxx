@@ -161,7 +161,7 @@ playlist::UpdateQueuedSong(PlayerControl &pc,
 }
 
 void
-playlist::StreamDetect(PlayerControl &pc, const DetachedSong &song)
+playlist::StreamDetect(PlayerControl &pc, const DetachedSong &song, unsigned order)
 {
 	FmtNotice(playlist_domain, "playlist::StreamDetect() entry");
 
@@ -169,7 +169,13 @@ playlist::StreamDetect(PlayerControl &pc, const DetachedSong &song)
 
 	pc.is_stream = (uri.compare(0, 4, "http") == 0);
 	if (pc.is_stream) {
+		unsigned position;
+
+		position = queue.OrderToPosition(order);
+		pc.stream_id = queue.PositionToId(position);
+
 		FmtNotice(playlist_domain, "stream detected");
+		FmtNotice(playlist_domain, "  id: {}", pc.stream_id);
 	}
 }
 
@@ -185,7 +191,7 @@ playlist::PlayOrder(PlayerControl &pc, unsigned order)
 
 	current = order;
 
-	StreamDetect(pc, song);
+	StreamDetect(pc, song, order);
 
 	pc.Play(std::make_unique<DetachedSong>(song));
 

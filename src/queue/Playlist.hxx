@@ -291,7 +291,7 @@ public:
 	 */
 	void PlayPosition(PlayerControl &pc, int position);
 
-	void StreamDetect(PlayerControl &pc, const DetachedSong &song);
+	void StreamDetect(PlayerControl &pc, const DetachedSong &song, unsigned order);
 
 	/**
 	 * Throws on error.
