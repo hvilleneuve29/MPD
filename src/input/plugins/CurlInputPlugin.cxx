@@ -631,6 +631,8 @@ input_curl_open(std::string_view url, Mutex &mutex)
 	    !StringStartsWithIgnoreCase(url, "https://"sv))
 		return nullptr;
 
+	FmtNotice(curl_domain, "input_curl_open(): url = {}", url);
+
 	return CurlInputStream::Open(url, {}, mutex);
 }
 
