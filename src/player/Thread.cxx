@@ -1234,28 +1234,14 @@ Player::Run() noexcept
 		}
 	}
 
-	if (pc.is_stream && !pc.user_requested_stop) {
-		// Trigger a restart
-		// Set the command directly on the PlayerControl object
-		FmtNotice(player_domain, "stream: try restart");
-		pc.Play(pc.ReadTaggedSong());
-		//pc.command = PlayerCommand::QUEUE;
-		//playlist::PlayPosition(pc, song);
+	pc.ClearTaggedSong();
 
-		FmtNotice(player_domain, "stream: delay 1s");
-		// Optional: Add a  small sleep to prevent rapid-fire loops
-		// if the network is completely down.
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-	} else {
-		pc.ClearTaggedSong();
-
-		if (queued) {
-			assert(pc.next_song != nullptr);
-			pc.next_song.reset();
-		}
-
-		pc.state = PlayerState::STOP;
+	if (queued) {
+		assert(pc.next_song != nullptr);
+		pc.next_song.reset();
 	}
+
+	pc.state = PlayerState::STOP;
 }
 
 static void
